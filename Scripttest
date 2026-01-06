@@ -11,7 +11,35 @@ local Window = Fluent:CreateWindow({
     Theme = "Dark",
     MinimizeKey = Enum.KeyCode.LeftControl -- Phím để đóng/mở menu
 })
+-- Tạo ScreenGui cho nút
+local ScreenGui = Instance.new("ScreenGui")
+local ToggleButton = Instance.new("TextButton")
 
+ScreenGui.Parent = game.CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Tùy chỉnh giao diện nút
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Parent = ScreenGui
+ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+ToggleButton.Position = UDim2.new(0.1, 0, 0.1, 0) -- Vị trí nút
+ToggleButton.Size = UDim2.new(0, 50, 0, 50)
+ToggleButton.Text = "Mở"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.Draggable = true -- Cho phép kéo nút đi chỗ khác
+
+-- Biến trỏ tới Frame chính của script bạn (thay "MainFrame" bằng tên Frame của bạn)
+local MainUI = game.CoreGui:FindFirstChild("Tên_Gui_Của_Bạn").MainFrame 
+
+ToggleButton.MouseButton1Click:Connect(function()
+    if MainUI.Visible == true then
+        MainUI.Visible = false
+        ToggleButton.Text = "Mở"
+    else
+        MainUI.Visible = true
+        ToggleButton.Text = "Đóng"
+    end
+end)
 -- Tạo các Tab (Danh mục)
 local Tabs = {
     Main = Window:AddTab({ Title = "Chức năng chính", Icon = "home" }),
