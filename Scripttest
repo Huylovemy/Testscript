@@ -1,26 +1,37 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/daucobonhi/Ui-Redz-V2/refs/heads/main/UiREDZv2.lua"))()
 
-local date = os.date("!*t")
-local dailyKey = "Bear-" .. tostring(date.day * date.month * date.year)
+-- Thiết lập Key mới ở đây
+local MyStatusKey = "Premium-Vip-2026" -- Bạn có thể đổi chữ này thành bất cứ gì bạn muốn
 
 local Window = MakeWindow({
     Hub = {
-        Title = "Bear Hud (Premium)",
-        Animation = "Bản premium"
+        Title = "BEAR HUD ⭐ PREMIUM",
+        Animation = "Bear Hub Edition"
     },
     Key = {
         KeySystem = true,
-        Title = "Hệ Thống Key",
-        Description = "Key thay đổi mỗi ngày!",
-        KeyLink = "https://link4m.com/kjzVaRAh",
-        Keys = {dailyKey},
+        Title = "🔐 HỆ THỐNG XÁC THỰC",
+        Description = "Vui lòng lấy mã Key để tiếp tục sử dụng bản Premium",
+        KeyLink = "https://link4m.com/kjzVaRAh", 
+        Keys = {MyStatusKey},
         Notifi = {
             Notifications = true,
-            CorrectKey = "Key chính xác! Chào mừng fen.",
-            IncorrectKey = "Sai key rồi, xem lại đi fen!"
+            CorrectKey = "Đăng nhập thành công! Đang tải dữ liệu...",
+            IncorrectKey = "Mã Key không chính xác, vui lòng thử lại!"
         }
     }
 })
+
+-- Nút thu gọn Menu
+MinimizeButton({
+    Image = "http://www.roblox.com/asset/?id=134852113716171",
+    Size = {25, 25},
+    Color = Color3.fromRGB(255, 255, 255),
+    Corner = true,
+    Stroke = true,
+    StrokeColor = Color3.fromRGB(0, 255, 127) -- Đổi sang màu xanh lá cho đẹp
+})
+
 
 
 -- Các dòng tiếp theo giữ nguyên như của bạn
