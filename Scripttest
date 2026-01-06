@@ -1,14 +1,7 @@
-loadstring(game:HttpGet(("https://raw.githubusercontent.com/daucobonhi/Ui-Redz-V2/refs/heads/main/UiREDzV2.lua")))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/daucobonhi/Ui-Redz-V2/refs/heads/main/UiREDZv2.lua"))()
 
-      
-       local Window = MakeWindow({
-         Hub = {
-         Title = "Bear Hud(Premium)                      by Quang Huy",
-         Animation = "Bản premium"
-         },
-        Key = {
-        local date = os.date("!*t")
-local dailyKey = "Bear-" .. tostring(date.day * date.month * date.year) -- Tạo key dựa trên ngày/tháng/năm
+local date = os.date("!*t")
+local dailyKey = "Bear-" .. tostring(date.day * date.month * date.year)
 
 local Window = MakeWindow({
     Hub = {
@@ -16,11 +9,11 @@ local Window = MakeWindow({
         Animation = "Bản premium"
     },
     Key = {
-        KeySystem = true, -- Bật lại hệ thống Key
+        KeySystem = true,
         Title = "Hệ Thống Key",
-        Description = "Key sẽ thay đổi mỗi ngày!",
-        KeyLink = "https://link4m.com/kjzVaRAh", -- Link dẫn đến nơi bạn ghi key
-        Keys = {dailyKey}, -- Key ngẫu nhiên theo ngày
+        Description = "Key thay đổi mỗi ngày!",
+        KeyLink = "https://link4m.com/kjzVaRAh",
+        Keys = {dailyKey},
         Notifi = {
             Notifications = true,
             CorrectKey = "Key chính xác! Chào mừng fen.",
@@ -28,7 +21,6 @@ local Window = MakeWindow({
         }
     }
 })
-
        MinimizeButton({
        Image = "http://www.roblox.com/asset/?id=134852113716171",
        Size = {25, 25},
