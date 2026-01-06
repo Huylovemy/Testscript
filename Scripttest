@@ -1,15 +1,98 @@
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
-local Window = Library:MakeWindow({Name = "Huylovemy Hub", HidePremium = false, SaveConfig = true})
-
-local MainTab = Window:MakeTab({Name = "Tính năng", Icon = "rbxassetid://4483345998"})
-
-MainTab:AddButton({
-	Name = "Bật Auto Farm",
-	Callback = function()
-        -- Dán logic Auto Farm của bạn vào đây
-        print("Đã bật Auto Farm!")
-  	end    
+local Window = Fluent:CreateWindow({
+    Title = "Huylovemy Hub | " .. os.date("%Y"),
+    SubTitle = "by Huylovemy",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = true, -- Làm mờ giao diện (nếu máy yếu có thể chỉnh false)
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl -- Phím để đóng/mở menu
 })
 
-Library:Init()
+-- Tạo các Tab (Danh mục)
+local Tabs = {
+    Main = Window:AddTab({ Title = "Chức năng chính", Icon = "home" }),
+    Settings = Window:AddTab({ Title = "Cài đặt", Icon = "settings" })
+}
+
+local Options = Fluent.Options
+
+do
+    -- Thông báo khi mở script
+    Fluent:Notify({
+        Title = "Huylovemy Script",
+        Content = "Giao diện đã được tải thành công!",
+        Duration = 5
+    })
+
+    -- 1. Thêm một Toggle (Bật/Tắt)
+    Tabs.Main:AddToggle("MyToggle", {Title = "Tự động Farm", Default = false})
+
+    Options.MyToggle:OnChanged(function()
+        local state = Options.MyToggle.Value
+        if state then
+            print("Đã bật Auto Farm")
+            -- Dán code vòng lặp Farm của bạn ở đây
+        else
+            print("Đã tắt Auto Farm")
+        end
+    end)
+
+    -- 2. Thêm một Slider (Thanh trượt)
+    Tabs.Main:AddSlider("WalkSpeed", {
+        Title = "Tốc độ chạy",
+        Description = "Chỉnh tốc độ nhân vật",
+        Default = 16,
+        Min = 16,
+        Max = 300,
+        Rounding = 1,
+        Callback = function(Value)
+            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
+        end
+    })
+
+    -- 3. Thêm một Nút bấm (Button)
+    Tabs.Main:AddButton({
+        Title = "Nhận tất cả rương",
+        Description = "Tự động dịch chuyển lấy rương",
+        Callback = function()
+            Window:Dialog({
+                Title = "Xác nhận",
+                Content = "Bạn có chắc muốn thực hiện không?",
+                Buttons = {
+                    {
+                        Title = "Đồng ý",
+                        Callback = function()
+                            print("Đang thực hiện...")
+                        end
+                    },
+                    {
+                        Title = "Hủy",
+                        Callback = function() end
+                    }
+                }
+            })
+        end
+    })
+end
+
+-- Tự động lưu cài đặt
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
+
+Window:SelectTab(1)
+
+Fluent:Notify({
+    Title = "Huylovemy",
+    Content = "Chúc bạn trải nghiệm vui vẻ!",
+    Duration = 5
+})
+
+SaveManager:LoadAutoloadConfig()
