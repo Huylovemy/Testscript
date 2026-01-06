@@ -22,6 +22,7 @@ local Window = MakeWindow({
     }
 })
 
+
 -- Các dòng tiếp theo giữ nguyên như của bạn
 MinimizeButton({
     Image = "http://www.roblox.com/asset/?id=134852113716171",
