@@ -1,126 +1,40 @@
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
-local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
-local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Kích hoạt Script</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5; margin: 0; }
+        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 350px; text-align: center; }
+        h2 { color: #333; margin-bottom: 1.5rem; }
+        input { width: 100%; padding: 12px; margin-bottom: 1rem; border: 2px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; text-transform: uppercase; text-align: center; }
+        input:focus { border-color: #007bff; outline: none; }
+        button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #0056b3; }
+        #message { margin-top: 1rem; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Nhập License Key</h2>
+        <input type="text" id="keyInput" placeholder="XXXX-XXXX-XXXX-XXXX" maxlength="19">
+        <button onclick="checkKey()">KÍCH HOẠT</button>
+        <div id="message"></div>
+    </div>
 
-local Window = Fluent:CreateWindow({
-    Title = "Huylovemy Hub | " .. os.date("%Y"),
-    SubTitle = "by Huylovemy",
-    TabWidth = 160,
-    Size = UDim2.fromOffset(580, 460),
-    Acrylic = true, -- Làm mờ giao diện (nếu máy yếu có thể chỉnh false)
-    Theme = "Dark",
-    MinimizeKey = Enum.KeyCode.LeftControl -- Phím để đóng/mở menu
-})
--- Tạo ScreenGui cho nút
-local ScreenGui = Instance.new("ScreenGui")
-local ToggleButton = Instance.new("TextButton")
-
-ScreenGui.Parent = game.CoreGui
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-
--- Tùy chỉnh giao diện nút
-ToggleButton.Name = "ToggleButton"
-ToggleButton.Parent = ScreenGui
-ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-ToggleButton.Position = UDim2.new(0.1, 0, 0.1, 0) -- Vị trí nút
-ToggleButton.Size = UDim2.new(0, 50, 0, 50)
-ToggleButton.Text = "Mở"
-ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-ToggleButton.Draggable = true -- Cho phép kéo nút đi chỗ khác
-
--- Biến trỏ tới Frame chính của script bạn (thay "MainFrame" bằng tên Frame của bạn)
-local MainUI = game.CoreGui:FindFirstChild("Tên_Gui_Của_Bạn").MainFrame 
-
-ToggleButton.MouseButton1Click:Connect(function()
-    if MainUI.Visible == true then
-        MainUI.Visible = false
-        ToggleButton.Text = "Mở"
-    else
-        MainUI.Visible = true
-        ToggleButton.Text = "Đóng"
-    end
-end)
--- Tạo các Tab (Danh mục)
-local Tabs = {
-    Main = Window:AddTab({ Title = "Chức năng chính", Icon = "home" }),
-    Settings = Window:AddTab({ Title = "Cài đặt", Icon = "settings" })
-}
-
-local Options = Fluent.Options
-
-do
-    -- Thông báo khi mở script
-    Fluent:Notify({
-        Title = "Huylovemy Script",
-        Content = "Giao diện đã được tải thành công!",
-        Duration = 5
-    })
-
-    -- 1. Thêm một Toggle (Bật/Tắt)
-    Tabs.Main:AddToggle("MyToggle", {Title = "Tự động Farm", Default = false})
-
-    Options.MyToggle:OnChanged(function()
-        local state = Options.MyToggle.Value
-        if state then
-            print("Đã bật Auto Farm")
-            -- Dán code vòng lặp Farm của bạn ở đây
-        else
-            print("Đã tắt Auto Farm")
-        end
-    end)
-
-    -- 2. Thêm một Slider (Thanh trượt)
-    Tabs.Main:AddSlider("WalkSpeed", {
-        Title = "Tốc độ chạy",
-        Description = "Chỉnh tốc độ nhân vật",
-        Default = 16,
-        Min = 16,
-        Max = 300,
-        Rounding = 1,
-        Callback = function(Value)
-            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
-        end
-    })
-
-    -- 3. Thêm một Nút bấm (Button)
-    Tabs.Main:AddButton({
-        Title = "Nhận tất cả rương",
-        Description = "Tự động dịch chuyển lấy rương",
-        Callback = function()
-            Window:Dialog({
-                Title = "Xác nhận",
-                Content = "Bạn có chắc muốn thực hiện không?",
-                Buttons = {
-                    {
-                        Title = "Đồng ý",
-                        Callback = function()
-                            print("Đang thực hiện...")
-                        end
-                    },
-                    {
-                        Title = "Hủy",
-                        Callback = function() end
-                    }
-                }
-            })
-        end
-    })
-end
-
--- Tự động lưu cài đặt
-SaveManager:SetLibrary(Fluent)
-InterfaceManager:SetLibrary(Fluent)
-SaveManager:IgnoreThemeSettings()
-SaveManager:SetIgnoreIndexes({})
-InterfaceManager:BuildInterfaceSection(Tabs.Settings)
-SaveManager:BuildConfigSection(Tabs.Settings)
-
-Window:SelectTab(1)
-
-Fluent:Notify({
-    Title = "Huylovemy",
-    Content = "Chúc bạn trải nghiệm vui vẻ!",
-    Duration = 5
-})
-
-SaveManager:LoadAutoloadConfig()
+    <script>
+        function checkKey() {
+            const key = document.getElementById('keyInput').value;
+            const msg = document.getElementById('message');
+            // Logic kiểm tra key giả định
+            if (key.length >= 10) {
+                msg.innerHTML = "✅ Key hợp lệ! Đang mở script...";
+                msg.style.color = "green";
+            } else {
+                msg.innerHTML = "❌ Key không đúng hoặc quá ngắn.";
+                msg.style.color = "red";
+            }
+        }
+    </script>
+</body>
+</html>
