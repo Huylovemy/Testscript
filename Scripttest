@@ -1,40 +1,27 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Kích hoạt Script</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5; margin: 0; }
-        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 350px; text-align: center; }
-        h2 { color: #333; margin-bottom: 1.5rem; }
-        input { width: 100%; padding: 12px; margin-bottom: 1rem; border: 2px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; text-transform: uppercase; text-align: center; }
-        input:focus { border-color: #007bff; outline: none; }
-        button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        button:hover { background: #0056b3; }
-        #message { margin-top: 1rem; font-size: 14px; }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <h2>Nhập License Key</h2>
-        <input type="text" id="keyInput" placeholder="XXXX-XXXX-XXXX-XXXX" maxlength="19">
-        <button onclick="checkKey()">KÍCH HOẠT</button>
-        <div id="message"></div>
-    </div>
+import tkinter as tk
+from tkinter import messagebox
 
-    <script>
-        function checkKey() {
-            const key = document.getElementById('keyInput').value;
-            const msg = document.getElementById('message');
-            // Logic kiểm tra key giả định
-            if (key.length >= 10) {
-                msg.innerHTML = "✅ Key hợp lệ! Đang mở script...";
-                msg.style.color = "green";
-            } else {
-                msg.innerHTML = "❌ Key không đúng hoặc quá ngắn.";
-                msg.style.color = "red";
-            }
-        }
-    </script>
-</body>
-</html>
+def validate_key():
+    entered_key = entry.get().strip()
+    # Ví dụ kiểm tra key đơn giản
+    if entered_key == "GEMINI-2026-OK":
+        messagebox.showinfo("Thành công", "Kích hoạt script thành công!")
+        root.destroy() # Đóng cửa sổ nhập key để vào script chính
+    else:
+        messagebox.showerror("Thất bại", "Key không chính xác. Vui lòng thử lại!")
+
+root = tk.Tk()
+root.title("Xác thực người dùng")
+root.geometry("300x150")
+
+# Căn giữa màn hình
+label = tk.Label(root, text="Vui lòng nhập Key để sử dụng:", pady=10)
+label.pack()
+
+entry = tk.Entry(root, width=25, justify='center')
+entry.pack(pady=5)
+
+btn = tk.Button(root, text="Xác nhận", command=validate_key, bg="#4CAF50", fg="white")
+btn.pack(pady=10)
+
+root.mainloop()
