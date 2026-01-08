@@ -1,27 +1,40 @@
-import tkinter as tk
-from tkinter import messagebox
+loadstring(game:HttpGet(("https://raw.githubusercontent.com/daucobonhi/Ui-Redz-V2/refs/heads/main/UiREDzV2.lua")))()
 
-def validate_key():
-    entered_key = entry.get().strip()
-    # Ví dụ kiểm tra key đơn giản
-    if entered_key == "GEMINI-2026-OK":
-        messagebox.showinfo("Thành công", "Kích hoạt script thành công!")
-        root.destroy() # Đóng cửa sổ nhập key để vào script chính
-    else:
-        messagebox.showerror("Thất bại", "Key không chính xác. Vui lòng thử lại!")
+      
+       local guiNames = {"BearHud", "BearHudPremium", "Main"}
+    local gui = game:GetService("CoreGui"):FindFirstChild(name) or game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild(name)
+    if gui then
+        gui.Enabled = false
+    end
+end
+        Key = {
+        KeySystem = false,
+        Title = "Huy Tổng Hợp",
+        Description = "Dùng Script Vui Vẻ",
+        KeyLink = "https://link4m.com/kjzVaRAh",
+        Keys = {""},
+        Notifi = {
+        Notifications = true,
+        CorrectKey = "Hello fen",
+       Incorrectkey = "Bản premium có key đâu mà nhập key",
+      }
+    }
+  })
 
-root = tk.Tk()
-root.title("Xác thực người dùng")
-root.geometry("300x150")
-
-# Căn giữa màn hình
-label = tk.Label(root, text="Vui lòng nhập Key để sử dụng:", pady=10)
-label.pack()
-
-entry = tk.Entry(root, width=25, justify='center')
-entry.pack(pady=5)
-
-btn = tk.Button(root, text="Xác nhận", command=validate_key, bg="#4CAF50", fg="white")
-btn.pack(pady=10)
-
-root.mainloop()
+       MinimizeButton({
+       Image = "http://www.roblox.com/asset/?id=134852113716171",
+       Size = {25, 25},
+       Color = Color3.fromRGB(255,255,255),
+       Corner = true,
+       Stroke = false,
+       StrokeColor = Color3.fromRGB(255, 0, 0),
+                     Color3.fromRGB(0, 0, 0),
+                     Color3.fromRGB(255,255,255)
+      })
+      
+------ Tab
+     local Tab1o = MakeTab({Name = "Script Blox Fruits"})
+     local Tab2o = MakeTab({Name = "Khác"})
+     local Tab3o = MakeTab({Name = "99 ngày Trong rừng"})
+     local Tab4o = MakeTab({Name = "Hop Sever"})
+     local Tab5o = MakeTab({Name = "Thông báo"})
