@@ -1,21 +1,24 @@
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService") -- Dịch vụ xử lý Input
 local LocalPlayer = Players.LocalPlayer
 
 -- 1. CẤU HÌNH GIAO DIỆN (GUI)
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "MyToggleGUI"
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false -- Giữ nguyên GUI khi chết
 
 local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 200, 0, 150)
-MainFrame.Position = UDim2.new(0.5, -100, 0.5, -75) -- Căn giữa màn hình
+MainFrame.Position = UDim2.new(0.5, -100, 0.5, -75) 
 MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 MainFrame.BorderSizePixel = 0
 MainFrame.Parent = ScreenGui
 
--- Làm bo tròn góc cho khung chính
+-- Bo tròn góc
 local UICornerMain = Instance.new("UICorner")
 UICornerMain.CornerRadius = UDim.new(0, 10)
 UICornerMain.Parent = MainFrame
@@ -31,44 +34,78 @@ Title.TextSize = 16
 Title.Parent = MainFrame
 
 ----------------------------------------------------------
--- 2. HÀM TẠO NÚT TOGGLE (Dùng để tạo nhiều nút giống nhau)
+-- [MỚI] CHỨC NĂNG KÉO THẢ (DRAGGABLE)
 ----------------------------------------------------------
+local dragging
+local dragInput
+local dragStart
+local startPos
+
+local function update(input)
+	local delta = input.Position - dragStart
+	MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+MainFrame.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = MainFrame.Position
+		
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+MainFrame.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+		dragInput = input
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		update(input)
+	end
+end)
+----------------------------------------------------------
+
+-- 2. HÀM TẠO NÚT TOGGLE
 function createToggle(name, positionY, callback)
-    -- Tạo khung chứa nút
     local ToggleFrame = Instance.new("Frame")
     ToggleFrame.Size = UDim2.new(1, -20, 0, 40)
     ToggleFrame.Position = UDim2.new(0, 10, 0, positionY)
     ToggleFrame.BackgroundTransparency = 1
     ToggleFrame.Parent = MainFrame
 
-    -- Tên chức năng (Ví dụ: Ghost, Ply)
     local Label = Instance.new("TextLabel")
     Label.Text = name
     Label.Size = UDim2.new(0.6, 0, 1, 0)
     Label.BackgroundTransparency = 1
-    Label.TextColor3 = Color3.fromRGB(100, 200, 255) -- Màu xanh nhạt giống ảnh
+    Label.TextColor3 = Color3.fromRGB(100, 200, 255)
     Label.Font = Enum.Font.GothamBold
     Label.TextXAlignment = Enum.TextXAlignment.Left
     Label.TextSize = 14
     Label.Parent = ToggleFrame
 
-    -- Nút bấm (Background của cái công tắc)
     local ButtonBg = Instance.new("TextButton")
     ButtonBg.Text = ""
     ButtonBg.Size = UDim2.new(0, 50, 0, 24)
-    ButtonBg.Position = UDim2.new(1, -50, 0.5, -12) -- Căn phải
-    ButtonBg.BackgroundColor3 = Color3.fromRGB(100, 100, 100) -- Màu xám khi tắt
+    ButtonBg.Position = UDim2.new(1, -50, 0.5, -12)
+    ButtonBg.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
     ButtonBg.AutoButtonColor = false
     ButtonBg.Parent = ToggleFrame
 
     local UICornerBtn = Instance.new("UICorner")
-    UICornerBtn.CornerRadius = UDim.new(1, 0) -- Bo tròn hoàn toàn
+    UICornerBtn.CornerRadius = UDim.new(1, 0)
     UICornerBtn.Parent = ButtonBg
 
-    -- Hình tròn bên trong (Cái nút trượt)
     local Circle = Instance.new("Frame")
     Circle.Size = UDim2.new(0, 20, 0, 20)
-    Circle.Position = UDim2.new(0, 2, 0.5, -10) -- Vị trí ban đầu bên trái
+    Circle.Position = UDim2.new(0, 2, 0.5, -10)
     Circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     Circle.Parent = ButtonBg
     
@@ -76,26 +113,19 @@ function createToggle(name, positionY, callback)
     UICornerCircle.CornerRadius = UDim.new(1, 0)
     UICornerCircle.Parent = Circle
 
-    -- Biến trạng thái (Bật hay Tắt)
     local isOn = false
 
-    -- Xử lý khi bấm nút
     ButtonBg.MouseButton1Click:Connect(function()
-        isOn = not isOn -- Đảo ngược trạng thái
-        
-        -- Gọi hàm xử lý chức năng
+        isOn = not isOn
         callback(isOn)
 
-        -- Tạo hiệu ứng chuyển động (Tween)
         local targetPos
         local targetColor
         
         if isOn then
-            -- Khi BẬT: Hình tròn sang phải, nền xanh
             targetPos = UDim2.new(1, -22, 0.5, -10)
-            targetColor = Color3.fromRGB(0, 255, 150) -- Xanh lá sáng
+            targetColor = Color3.fromRGB(0, 255, 150)
         else
-            -- Khi TẮT: Hình tròn về trái, nền xám
             targetPos = UDim2.new(0, 2, 0.5, -10)
             targetColor = Color3.fromRGB(100, 100, 100)
         end
@@ -106,15 +136,13 @@ function createToggle(name, positionY, callback)
 end
 
 ----------------------------------------------------------
--- 3. ĐỊNH NGHĨA CHỨC NĂNG (LOGIC)
+-- 3. LOGIC CHỨC NĂNG
 ----------------------------------------------------------
 
--- Chức năng 1: Ghost (Noclip - Đi xuyên tường)
+-- Ghost Mode
 local noclipConnection = nil
 createToggle("Ghost Mode", 40, function(state)
     if state then
-        print("Ghost: ON")
-        -- Bật Noclip: Chạy liên tục mỗi khung hình để tắt va chạm
         noclipConnection = RunService.Stepped:Connect(function()
             if LocalPlayer.Character then
                 for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
@@ -125,8 +153,6 @@ createToggle("Ghost Mode", 40, function(state)
             end
         end)
     else
-        print("Ghost: OFF")
-        -- Tắt Noclip
         if noclipConnection then
             noclipConnection:Disconnect()
             noclipConnection = nil
@@ -134,16 +160,14 @@ createToggle("Ghost Mode", 40, function(state)
     end
 end)
 
--- Chức năng 2: Ply (Ví dụ: Tăng tốc độ chạy - WalkSpeed)
+-- Ply Speed (Chạy nhanh)
 createToggle("Ply Speed", 90, function(state)
-    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-    local hum = char:WaitForChild("Humanoid")
-    
-    if state then
-        print("Ply Speed: ON")
-        hum.WalkSpeed = 50 -- Chạy nhanh
-    else
-        print("Ply Speed: OFF")
-        hum.WalkSpeed = 16 -- Tốc độ mặc định
+    local char = LocalPlayer.Character
+    if char and char:FindFirstChild("Humanoid") then
+        if state then
+            char.Humanoid.WalkSpeed = 50
+        else
+            char.Humanoid.WalkSpeed = 16
+        end
     end
 end)
