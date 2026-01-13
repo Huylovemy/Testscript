@@ -1,21 +1,22 @@
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService") -- Dịch vụ xử lý Input
+local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 
 -- 1. CẤU HÌNH GIAO DIỆN (GUI)
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "MyToggleGUI"
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-ScreenGui.ResetOnSpawn = false -- Giữ nguyên GUI khi chết
+ScreenGui.ResetOnSpawn = false 
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 200, 0, 150)
+MainFrame.Size = UDim2.new(0, 200, 0, 150) -- Kích thước gốc khi mở
 MainFrame.Position = UDim2.new(0.5, -100, 0.5, -75) 
 MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 MainFrame.BorderSizePixel = 0
+MainFrame.ClipsDescendants = true -- QUAN TRỌNG: Cắt bỏ phần thừa khi thu nhỏ
 MainFrame.Parent = ScreenGui
 
 -- Bo tròn góc
@@ -26,20 +27,50 @@ UICornerMain.Parent = MainFrame
 -- Tiêu đề
 local Title = Instance.new("TextLabel")
 Title.Text = "MENU CHỨC NĂNG"
-Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Size = UDim2.new(1, -30, 0, 30) -- Chừa chỗ cho nút thu nhỏ
+Title.Position = UDim2.new(0, 10, 0, 0)
 Title.BackgroundTransparency = 1
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 16
+Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = MainFrame
 
 ----------------------------------------------------------
--- [MỚI] CHỨC NĂNG KÉO THẢ (DRAGGABLE)
+-- [MỚI] NÚT THU NHỎ / MỞ RỘNG (MINIMIZE BUTTON)
 ----------------------------------------------------------
-local dragging
-local dragInput
-local dragStart
-local startPos
+local MinBtn = Instance.new("TextButton")
+MinBtn.Name = "MinimizeButton"
+MinBtn.Text = "-"
+MinBtn.Size = UDim2.new(0, 30, 0, 30)
+MinBtn.Position = UDim2.new(1, -30, 0, 0) -- Góc trên phải
+MinBtn.BackgroundTransparency = 1
+MinBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+MinBtn.Font = Enum.Font.GothamBold
+MinBtn.TextSize = 24
+MinBtn.Parent = MainFrame
+
+local isMinimized = false
+local originalHeight = MainFrame.Size.Y.Offset -- Lưu chiều cao gốc (150)
+
+MinBtn.MouseButton1Click:Connect(function()
+	isMinimized = not isMinimized -- Đảo trạng thái
+
+	if isMinimized then
+		-- Thu nhỏ: Chỉ còn chiều cao 30 (bằng thanh tiêu đề)
+		TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 200, 0, 30)}):Play()
+		MinBtn.Text = "+" -- Đổi dấu thành cộng
+	else
+		-- Mở rộng: Trở về chiều cao gốc
+		TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 200, 0, originalHeight)}):Play()
+		MinBtn.Text = "-" -- Đổi dấu thành trừ
+	end
+end)
+
+----------------------------------------------------------
+-- CHỨC NĂNG KÉO THẢ (DRAGGABLE)
+----------------------------------------------------------
+local dragging, dragInput, dragStart, startPos
 
 local function update(input)
 	local delta = input.Position - dragStart
@@ -47,16 +78,20 @@ local function update(input)
 end
 
 MainFrame.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-		dragging = true
-		dragStart = input.Position
-		startPos = MainFrame.Position
-		
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				dragging = false
-			end
-		end)
+	if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+		-- Chỉ cho phép kéo khi bấm vào vùng tiêu đề (chiều cao < 30)
+		-- để tránh bị kẹt khi bấm vào các nút chức năng
+		if input.Position.Y - MainFrame.AbsolutePosition.Y < 30 then 
+			dragging = true
+			dragStart = input.Position
+			startPos = MainFrame.Position
+			
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
 	end
 end)
 
@@ -71,9 +106,10 @@ UserInputService.InputChanged:Connect(function(input)
 		update(input)
 	end
 end)
-----------------------------------------------------------
 
+----------------------------------------------------------
 -- 2. HÀM TẠO NÚT TOGGLE
+----------------------------------------------------------
 function createToggle(name, positionY, callback)
     local ToggleFrame = Instance.new("Frame")
     ToggleFrame.Size = UDim2.new(1, -20, 0, 40)
@@ -119,9 +155,7 @@ function createToggle(name, positionY, callback)
         isOn = not isOn
         callback(isOn)
 
-        local targetPos
-        local targetColor
-        
+        local targetPos, targetColor
         if isOn then
             targetPos = UDim2.new(1, -22, 0.5, -10)
             targetColor = Color3.fromRGB(0, 255, 150)
@@ -129,7 +163,6 @@ function createToggle(name, positionY, callback)
             targetPos = UDim2.new(0, 2, 0.5, -10)
             targetColor = Color3.fromRGB(100, 100, 100)
         end
-
         TweenService:Create(Circle, TweenInfo.new(0.2), {Position = targetPos}):Play()
         TweenService:Create(ButtonBg, TweenInfo.new(0.2), {BackgroundColor3 = targetColor}):Play()
     end)
@@ -160,7 +193,7 @@ createToggle("Ghost Mode", 40, function(state)
     end
 end)
 
--- Ply Speed (Chạy nhanh)
+-- Ply Speed
 createToggle("Ply Speed", 90, function(state)
     local char = LocalPlayer.Character
     if char and char:FindFirstChild("Humanoid") then
