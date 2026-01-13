@@ -1,40 +1,149 @@
-loadstring(game:HttpGet(("https://raw.githubusercontent.com/daucobonhi/Ui-Redz-V2/refs/heads/main/UiREDzV2.lua")))()
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
 
-      
-       local guiNames = {"BearHud", "BearHudPremium", "Main"}
-    local gui = game:GetService("CoreGui"):FindFirstChild(name) or game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild(name)
-    if gui then
-        gui.Enabled = false
-    end
+-- 1. CẤU HÌNH GIAO DIỆN (GUI)
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "MyToggleGUI"
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 200, 0, 150)
+MainFrame.Position = UDim2.new(0.5, -100, 0.5, -75) -- Căn giữa màn hình
+MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+MainFrame.BorderSizePixel = 0
+MainFrame.Parent = ScreenGui
+
+-- Làm bo tròn góc cho khung chính
+local UICornerMain = Instance.new("UICorner")
+UICornerMain.CornerRadius = UDim.new(0, 10)
+UICornerMain.Parent = MainFrame
+
+-- Tiêu đề
+local Title = Instance.new("TextLabel")
+Title.Text = "MENU CHỨC NĂNG"
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundTransparency = 1
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 16
+Title.Parent = MainFrame
+
+----------------------------------------------------------
+-- 2. HÀM TẠO NÚT TOGGLE (Dùng để tạo nhiều nút giống nhau)
+----------------------------------------------------------
+function createToggle(name, positionY, callback)
+    -- Tạo khung chứa nút
+    local ToggleFrame = Instance.new("Frame")
+    ToggleFrame.Size = UDim2.new(1, -20, 0, 40)
+    ToggleFrame.Position = UDim2.new(0, 10, 0, positionY)
+    ToggleFrame.BackgroundTransparency = 1
+    ToggleFrame.Parent = MainFrame
+
+    -- Tên chức năng (Ví dụ: Ghost, Ply)
+    local Label = Instance.new("TextLabel")
+    Label.Text = name
+    Label.Size = UDim2.new(0.6, 0, 1, 0)
+    Label.BackgroundTransparency = 1
+    Label.TextColor3 = Color3.fromRGB(100, 200, 255) -- Màu xanh nhạt giống ảnh
+    Label.Font = Enum.Font.GothamBold
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.TextSize = 14
+    Label.Parent = ToggleFrame
+
+    -- Nút bấm (Background của cái công tắc)
+    local ButtonBg = Instance.new("TextButton")
+    ButtonBg.Text = ""
+    ButtonBg.Size = UDim2.new(0, 50, 0, 24)
+    ButtonBg.Position = UDim2.new(1, -50, 0.5, -12) -- Căn phải
+    ButtonBg.BackgroundColor3 = Color3.fromRGB(100, 100, 100) -- Màu xám khi tắt
+    ButtonBg.AutoButtonColor = false
+    ButtonBg.Parent = ToggleFrame
+
+    local UICornerBtn = Instance.new("UICorner")
+    UICornerBtn.CornerRadius = UDim.new(1, 0) -- Bo tròn hoàn toàn
+    UICornerBtn.Parent = ButtonBg
+
+    -- Hình tròn bên trong (Cái nút trượt)
+    local Circle = Instance.new("Frame")
+    Circle.Size = UDim2.new(0, 20, 0, 20)
+    Circle.Position = UDim2.new(0, 2, 0.5, -10) -- Vị trí ban đầu bên trái
+    Circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Circle.Parent = ButtonBg
+    
+    local UICornerCircle = Instance.new("UICorner")
+    UICornerCircle.CornerRadius = UDim.new(1, 0)
+    UICornerCircle.Parent = Circle
+
+    -- Biến trạng thái (Bật hay Tắt)
+    local isOn = false
+
+    -- Xử lý khi bấm nút
+    ButtonBg.MouseButton1Click:Connect(function()
+        isOn = not isOn -- Đảo ngược trạng thái
+        
+        -- Gọi hàm xử lý chức năng
+        callback(isOn)
+
+        -- Tạo hiệu ứng chuyển động (Tween)
+        local targetPos
+        local targetColor
+        
+        if isOn then
+            -- Khi BẬT: Hình tròn sang phải, nền xanh
+            targetPos = UDim2.new(1, -22, 0.5, -10)
+            targetColor = Color3.fromRGB(0, 255, 150) -- Xanh lá sáng
+        else
+            -- Khi TẮT: Hình tròn về trái, nền xám
+            targetPos = UDim2.new(0, 2, 0.5, -10)
+            targetColor = Color3.fromRGB(100, 100, 100)
+        end
+
+        TweenService:Create(Circle, TweenInfo.new(0.2), {Position = targetPos}):Play()
+        TweenService:Create(ButtonBg, TweenInfo.new(0.2), {BackgroundColor3 = targetColor}):Play()
+    end)
 end
-        Key = {
-        KeySystem = false,
-        Title = "Huy Tổng Hợp",
-        Description = "Dùng Script Vui Vẻ",
-        KeyLink = "https://link4m.com/kjzVaRAh",
-        Keys = {""},
-        Notifi = {
-        Notifications = true,
-        CorrectKey = "Hello fen",
-       Incorrectkey = "Bản premium có key đâu mà nhập key",
-      }
-    }
-  })
 
-       MinimizeButton({
-       Image = "http://www.roblox.com/asset/?id=134852113716171",
-       Size = {25, 25},
-       Color = Color3.fromRGB(255,255,255),
-       Corner = true,
-       Stroke = false,
-       StrokeColor = Color3.fromRGB(255, 0, 0),
-                     Color3.fromRGB(0, 0, 0),
-                     Color3.fromRGB(255,255,255)
-      })
-      
------- Tab
-     local Tab1o = MakeTab({Name = "Script Blox Fruits"})
-     local Tab2o = MakeTab({Name = "Khác"})
-     local Tab3o = MakeTab({Name = "99 ngày Trong rừng"})
-     local Tab4o = MakeTab({Name = "Hop Sever"})
-     local Tab5o = MakeTab({Name = "Thông báo"})
+----------------------------------------------------------
+-- 3. ĐỊNH NGHĨA CHỨC NĂNG (LOGIC)
+----------------------------------------------------------
+
+-- Chức năng 1: Ghost (Noclip - Đi xuyên tường)
+local noclipConnection = nil
+createToggle("Ghost Mode", 40, function(state)
+    if state then
+        print("Ghost: ON")
+        -- Bật Noclip: Chạy liên tục mỗi khung hình để tắt va chạm
+        noclipConnection = RunService.Stepped:Connect(function()
+            if LocalPlayer.Character then
+                for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                    if part:IsA("BasePart") and part.CanCollide == true then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end)
+    else
+        print("Ghost: OFF")
+        -- Tắt Noclip
+        if noclipConnection then
+            noclipConnection:Disconnect()
+            noclipConnection = nil
+        end
+    end
+end)
+
+-- Chức năng 2: Ply (Ví dụ: Tăng tốc độ chạy - WalkSpeed)
+createToggle("Ply Speed", 90, function(state)
+    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local hum = char:WaitForChild("Humanoid")
+    
+    if state then
+        print("Ply Speed: ON")
+        hum.WalkSpeed = 50 -- Chạy nhanh
+    else
+        print("Ply Speed: OFF")
+        hum.WalkSpeed = 16 -- Tốc độ mặc định
+    end
+end)
