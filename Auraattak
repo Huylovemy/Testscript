@@ -1,0 +1,90 @@
+--/// CẤU HÌNH ///
+local TAM_XA = 40          -- Khoảng cách tối đa để bắn
+local SAT_THUONG = 10      -- Lượng máu trừ mỗi lần bắn
+local TOC_DO_BAN = 0.5     -- Thời gian chờ giữa các lần bắn (giây)
+
+--/// DỊCH VỤ & BIẾN ///
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Debris = game:GetService("Debris") -- Dùng để xóa đạn sau khi bắn
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+--/// HÀM TÌM QUÁI GẦN NHẤT ///
+local function TimQuaiGanNhat()
+    local khoangCachNganNhat = TAM_XA
+    local mucTieu = nil
+
+    -- Lặp qua tất cả model trong workspace (Lưu ý: Để tối ưu, nên gom quái vào 1 Folder riêng)
+    for _, obj in pairs(workspace:GetDescendants()) do
+        -- Kiểm tra xem đối tượng có phải là Humanoid (có máu) không
+        if obj:IsA("Humanoid") and obj.Parent ~= character and obj.Health > 0 then
+            local enemyRoot = obj.Parent:FindFirstChild("HumanoidRootPart")
+            
+            if enemyRoot then
+                -- Tính khoảng cách giữa người chơi và quái
+                local khoangCach = (rootPart.Position - enemyRoot.Position).Magnitude
+                
+                -- Nếu khoảng cách nhỏ hơn kỉ lục hiện tại, cập nhật mục tiêu
+                if khoangCach < khoangCachNganNhat then
+                    khoangCachNganNhat = khoangCach
+                    mucTieu = obj.Parent
+                end
+            end
+        end
+    end
+    
+    return mucTieu
+end
+
+--/// HÀM HIỆU ỨNG ĐẠN (VISUAL) ///
+local function TaoHieuUngDan(targetPos)
+    local p = Instance.new("Part")
+    p.Size = Vector3.new(0.5, 0.5, 1)
+    p.Color = Color3.fromRGB(255, 0, 0) -- Màu đỏ
+    p.Anchored = true
+    p.CanCollide = false
+    p.Material = Enum.Material.Neon
+    
+    -- Đặt vị trí đạn xuất phát từ người chơi hướng về quái
+    p.CFrame = CFrame.new(rootPart.Position, targetPos)
+    p.Parent = workspace
+    
+    -- Tạo chuyển động bay tới (Tween hoặc đơn giản là xóa sau 0.1s để giả lập tia laser)
+    -- Ở đây làm đơn giản là tạo tia nối dài
+    local distance = (rootPart.Position - targetPos).Magnitude
+    p.Size = Vector3.new(0.2, 0.2, distance)
+    p.CFrame = CFrame.new(rootPart.Position, targetPos) * CFrame.new(0, 0, -distance/2)
+    
+    Debris:AddItem(p, 0.1) -- Tự xóa sau 0.1 giây
+end
+
+--/// VÒNG LẶP TẤN CÔNG ///
+task.spawn(function()
+    while true do
+        if character.Humanoid.Health > 0 then
+            local quai = TimQuaiGanNhat()
+            
+            if quai then
+                local humanoidQuai = quai:FindFirstChild("Humanoid")
+                local rootQuai = quai:FindFirstChild("HumanoidRootPart")
+                
+                if humanoidQuai and rootQuai then
+                    print("Đang bắn: " .. quai.Name)
+                    
+                    -- 1. Tạo hiệu ứng
+                    TaoHieuUngDan(rootQuai.Position)
+                    
+                    -- 2. Gây sát thương
+                    -- Lưu ý: Nếu dùng LocalScript, dòng này chỉ hiển thị phía bạn. 
+                    -- Để trừ máu thật, bạn cần dùng RemoteEvent gửi lên Server.
+                    humanoidQuai:TakeDamage(SAT_THUONG) 
+                end
+            end
+        end
+        task.wait(TOC_DO_BAN)
+    end
+end)
+
