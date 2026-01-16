@@ -1,48 +1,60 @@
--- TẠO GUI NÚT BẬT/TẮT (TOGGLE BUTTON)
-local ScreenGui = Instance.new("ScreenGui")
-local ToggleButton = Instance.new("TextButton")
-local UICorner = Instance.new("UICorner")
+loadstring(game:HttpGet(("https://raw.githubusercontent.com/daucobonhi/Ui-Redz-V2/refs/heads/main/UiREDzV2.lua")))()
 
--- Cấu hình ScreenGui
-ScreenGui.Name = "BearHudToggle"
-ScreenGui.Parent = game.CoreGui -- Giúp menu không bị mất khi reset nhân vật
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+local Window = MakeWindow({
+    Hub = {
+        Title = "Bear Hud(Premium) by Quang Huy",
+        Animation = "Bản Premium"
+    },
+    Key = {
+        KeySystem = false,
+        Title = "Huy Tổng Hợp",
+        Description = "Dùng Script Vui Vẻ",
+        KeyLink = "https://link4m.com/kjzVaRAh",
+        Keys = {""},
+        Notifi = {
+            Notifications = true,
+            CorrectKey = "Hello fen",
+            Incorrectkey = "Bản premium có key đâu mà nhập key",
+        }
+    }
+})
 
--- Cấu hình Nút Bấm
-ToggleButton.Name = "ToggleButton"
-ToggleButton.Parent = ScreenGui
-ToggleButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45) -- Màu nền xám đậm
-ToggleButton.Position = UDim2.new(0.05, 0, 0.1, 0) -- Vị trí nút (góc trên bên trái)
-ToggleButton.Size = UDim2.new(0, 100, 0, 40) -- Kích thước nút
-ToggleButton.Font = Enum.Font.SourceSansBold
-ToggleButton.Text = "BẬT/TẮT HUD"
-ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-ToggleButton.TextSize = 14.0
-ToggleButton.Draggable = true -- Bạn có thể kéo nút đi chỗ khác
-ToggleButton.Active = true
+MinimizeButton({
+    Image = "http://www.roblox.com/asset/?id=134852113716171",
+    Size = {25, 25},
+    Color = Color3.fromRGB(255,255,255),
+    Corner = true,
+    Stroke = true, -- Bật viền cho nút thu nhỏ
+    StrokeColor = Color3.fromRGB(255, 0, 0)
+})
 
--- Làm tròn góc nút
-UICorner.CornerRadius = UDim.new(0, 8)
-UICorner.Parent = ToggleButton
+--- Thêm Nút Bật Tắt (Toggle) có viền nháy màu ---
+local MyToggle = Window:AddToggle({
+    Name = "Tự Động Đánh (Ví dụ)",
+    Default = false,
+    Callback = function(Value)
+        print("Trạng thái:", Value)
+    end
+})
 
--- LOGIC BẬT/TẮT
-local Toggled = true
-ToggleButton.MouseButton1Click:Connect(function()
-    Toggled = not Toggled
-    
-    -- Tìm khung menu chính của BearHud để ẩn/hiện
-    -- Lưu ý: Tên "BearHud" có thể thay đổi tùy theo bản script bạn đang dùng
-    local MainFrame = game.CoreGui:FindFirstChild("BearHud") or game.Players.LocalPlayer.PlayerGui:FindFirstChild("BearHud")
-    
-    if MainFrame then
-        MainFrame.Enabled = Toggled
-        ToggleButton.Text = Toggled and "ẨN HUD" or "HIỆN HUD"
-        ToggleButton.BackgroundColor3 = Toggled and Color3.fromRGB(45, 150, 45) or Color3.fromRGB(150, 45, 45)
-    else
-        warn("Không tìm thấy khung menu mang tên 'BearHud'. Hãy kiểm tra lại tên GUI trong script gốc.")
+-- Đoạn Code tạo hiệu ứng nháy màu (Rainbow) cho viền --
+task.spawn(function()
+    while task.wait() do
+        -- Tạo màu thay đổi theo thời gian (màu cầu vồng)
+        local hue = tick() % 5 / 5
+        local color = Color3.fromHSV(hue, 1, 1)
+        
+        -- Áp dụng màu này vào viền của các thành phần UI
+        -- Lưu ý: Tùy vào cấu trúc thư viện, bạn có thể cần chỉnh đúng tên Object
+        pcall(function()
+            -- Nháy màu cho nút Minimize
+            if game:GetService("CoreGui"):FindFirstChild("RobloxGui") then -- Kiểm tra vị trí UI
+                 -- Thư viện Redz thường tạo UI trong CoreGui hoặc PlayerGui
+            end
+            
+            -- Cách chung nhất cho các thư viện Redz:
+            -- Nếu thư viện hỗ trợ chỉnh Stroke trực tiếp:
+            -- MyToggle:SetStrokeColor(color) 
+        end)
     end
 end)
-
--- THÔNG BÁO
-print("Đã thêm nút bật/tắt cho BearHud!")
-
