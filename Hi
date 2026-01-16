@@ -26,45 +26,18 @@ local MinButton = MinimizeButton({
     Color = Color3.fromRGB(255,255,255),
     Corner = true,
     Stroke = true,
-    StrokeColor = Color3.fromRGB(255, 0, 0)
+    StrokeColor = Color3.fromRGB(255, 0, 0) -- Màu mặc định ban đầu
 })
 
---- PHẦN THÊM HIỆU ỨNG NHÁY ĐA MÀU (RAINBOW) ---
+-- Đoạn code xử lý hiệu ứng nháy đổi màu viền (RGB)
 task.spawn(function()
-    local speed = 2 -- Tốc độ đổi màu (số càng cao nháy càng nhanh)
-    
-    while task.wait() do
-        -- Tính toán màu sắc dựa trên thời gian thực
-        local hue = (tick() * speed) % 1 
-        local rainbowColor = Color3.fromHSV(hue, 1, 1) -- Tạo màu cầu vồng cực đẹp
+    while task.wait() do 
+        local hue = tick() % 5 / 5 -- Thay đổi tốc độ bằng cách chỉnh con số 5 (số càng nhỏ đổi màu càng nhanh)
+        local color = Color3.fromHSV(hue, 1, 1)
         
-        -- 1. Nháy màu cho viền của Nút Thu Nhỏ (Minimize Button)
-        pcall(function()
-            -- Tìm UIStroke bên trong nút thu nhỏ
-            for _, v in pairs(game:GetService("CoreGui"):GetDescendants()) do
-                if v:IsA("UIStroke") and v.Parent.Name == "MinimizeButton" then
-                    v.Color = rainbowColor
-                end
-            end
-        end)
-        
-        -- 2. Nháy màu cho viền của các Nút Bật Tắt (Toggle) trong Menu
-        -- Nếu bạn muốn mọi cái viền (Stroke) trong Menu đều nháy màu:
-        pcall(function()
-            for _, child in pairs(game:GetService("CoreGui"):GetDescendants()) do
-                if child:IsA("UIStroke") then
-                    child.Color = rainbowColor
-                end
-            end
-        end)
+        -- Cập nhật màu cho viền của nút
+        if MinButton then
+            MinButton.StrokeColor = color
+        end
     end
 end)
-
---- Ví dụ thêm 1 cái Toggle để bạn thấy nó nháy viền ---
-Window:AddToggle({
-    Name = "Bật Nháy Viền Test",
-    Default = false,
-    Callback = function(t)
-        print("Trạng thái:", t)
-    end
-})
