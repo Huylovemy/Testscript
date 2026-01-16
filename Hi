@@ -1,0 +1,48 @@
+-- TẠO GUI NÚT BẬT/TẮT (TOGGLE BUTTON)
+local ScreenGui = Instance.new("ScreenGui")
+local ToggleButton = Instance.new("TextButton")
+local UICorner = Instance.new("UICorner")
+
+-- Cấu hình ScreenGui
+ScreenGui.Name = "BearHudToggle"
+ScreenGui.Parent = game.CoreGui -- Giúp menu không bị mất khi reset nhân vật
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Cấu hình Nút Bấm
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Parent = ScreenGui
+ToggleButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45) -- Màu nền xám đậm
+ToggleButton.Position = UDim2.new(0.05, 0, 0.1, 0) -- Vị trí nút (góc trên bên trái)
+ToggleButton.Size = UDim2.new(0, 100, 0, 40) -- Kích thước nút
+ToggleButton.Font = Enum.Font.SourceSansBold
+ToggleButton.Text = "BẬT/TẮT HUD"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.TextSize = 14.0
+ToggleButton.Draggable = true -- Bạn có thể kéo nút đi chỗ khác
+ToggleButton.Active = true
+
+-- Làm tròn góc nút
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = ToggleButton
+
+-- LOGIC BẬT/TẮT
+local Toggled = true
+ToggleButton.MouseButton1Click:Connect(function()
+    Toggled = not Toggled
+    
+    -- Tìm khung menu chính của BearHud để ẩn/hiện
+    -- Lưu ý: Tên "BearHud" có thể thay đổi tùy theo bản script bạn đang dùng
+    local MainFrame = game.CoreGui:FindFirstChild("BearHud") or game.Players.LocalPlayer.PlayerGui:FindFirstChild("BearHud")
+    
+    if MainFrame then
+        MainFrame.Enabled = Toggled
+        ToggleButton.Text = Toggled and "ẨN HUD" or "HIỆN HUD"
+        ToggleButton.BackgroundColor3 = Toggled and Color3.fromRGB(45, 150, 45) or Color3.fromRGB(150, 45, 45)
+    else
+        warn("Không tìm thấy khung menu mang tên 'BearHud'. Hãy kiểm tra lại tên GUI trong script gốc.")
+    end
+end)
+
+-- THÔNG BÁO
+print("Đã thêm nút bật/tắt cho BearHud!")
+
